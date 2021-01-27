@@ -6,8 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": " <Viet Anh DO>",
-  "license": "ISC",
+  "author": "Viet Anh DO <dovietanh.th@gmail.com>",  
+  "repository": "vahaha/treejs",
+  "license": "MIT",
   "devDependencies": {
     "eslint": "7.14.0",
     "eslint-plugin-prettier": "3.1.4",
