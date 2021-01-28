@@ -1,8 +1,16 @@
 const _ = require('lodash')
 
 const buildTree = (nodes, keyName, parentFieldName) => {
+    if (!Array.isArray(nodes)) {
+        throw new Error('nodes must be an array')
+    }
+
+    if (!keyName) {
+        throw new Error('unknown key name')
+    }
+
     if (!parentFieldName) {
-        throw new Error('parent field name is required')
+        throw new Error('unknown parent field name')
     }
 
     const availableNodes = nodes.filter(node => node)
@@ -11,8 +19,9 @@ const buildTree = (nodes, keyName, parentFieldName) => {
     let leafIds = new Set(Object.keys(indexNodes))
     const parentIds = new Set()
 
-    for (let i = 0; i < nodes.length; i++) {
-        const parentId = nodes[i][parentFieldName]
+    // find nodes're leaf
+    for (let i = 0; i < availableNodes.length; i++) {
+        const parentId = availableNodes[i][parentFieldName]
 
         if (parentId) {
             parentIds.add(parentId)
@@ -23,6 +32,8 @@ const buildTree = (nodes, keyName, parentFieldName) => {
     leafIds = Array.from(leafIds)
     let leafs = leafIds.map(id => indexNodes[id])
 
+    // find trees and filter leaf(node) isn't tree.
+    // leaf(node) stand alone(don't have parent), that's tree
     const tmpLeafs = []
     const trees = []
 
@@ -39,22 +50,26 @@ const buildTree = (nodes, keyName, parentFieldName) => {
         return trees
     }
 
+    // there are leafs have parent. so we need continue to build tree
+    // groupping leafs to branch level
     const leafGroup = _.groupBy(leafs, parentFieldName)
-    const parents = Array.from(parentIds).map(id => {
+    const branches = Array.from(parentIds).map(id => {
         const parentId = id.toString()
-        const parent = indexNodes[parentId]
+        const branch = indexNodes[parentId]
         const children = leafGroup[parentId]
         if (children) {
-            if (parent.children) {
-                parent.children = [...parent.children, ...children]
+            if (branch.children) {
+                branch.children = [...branch.children, ...children]
             } else {
-                parent.children = children
+                branch.children = children
             }
         }
-        return parent
+        return branch
     })
 
-    return [...trees, ...buildTree(parents, keyName, parentFieldName)]
+    // continue to build trees with branches in nodes role
+    // and retunning when completed
+    return [...trees, ...buildTree(branches, keyName, parentFieldName)]
 }
 
 module.exports = {

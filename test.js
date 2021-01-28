@@ -1,6 +1,8 @@
 const Tree = require('./index')
 
 const nodes = [
+    null,
+    {},
     {
         id: '1',
         name: 'Root 1',
