@@ -1,6 +1,6 @@
 {
   "name": "@vahaha/treejs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "build tree from array",
   "main": "index.js",
   "scripts": {
