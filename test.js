@@ -38,4 +38,10 @@ const nodes = [
     },
 ]
 
-console.log(JSON.stringify(Tree.buildTree(nodes, 'id', 'parentId'), null, 4))
+const tree = Tree.buildTree(nodes, 'id', 'parentId', {
+    childrenFieldName: 'baby',
+    cloneDeep: true,
+})
+console.log(JSON.stringify(tree, null, 4))
+tree[1].name = 'Root 2 - edit'
+console.log(nodes)
