@@ -1,5 +1,12 @@
 ## Usage
 ```js
+const Tree = require('@vahaha/treejs');
+
+const tree = Tree.buildTree(nodes, keyName, parentFieldName);
+```
+
+### Example:
+```js
 var Tree = require('@vahaha/treejs');
 
 const nodes = [
@@ -38,7 +45,10 @@ const nodes = [
     }
 ];
 
-const tree = Tree.buildTree(nodes, "id", "parentId")
+const keyName = "id";
+const parentFieldName = "parentId";
+
+const tree = Tree.buildTree(nodes, keyName, parentFieldName)
 
 /* result:
 [
