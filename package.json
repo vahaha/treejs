@@ -1,8 +1,14 @@
 {
   "name": "@vahaha/treejs",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "build tree from array",
   "main": "index.js",
+  "keywords": [
+    "tree",
+    "array to tree",
+    "array",
+    "treejs"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
