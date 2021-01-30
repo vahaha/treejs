@@ -74,7 +74,10 @@ const buildTree = (
         const branch = indexNodes[parentId]
         const children = leafGroup[parentId]
         if (children) {
-            if (branch[childrenFieldName]) {
+            if (
+                branch[childrenFieldName] &&
+                Array.isArray(branch[childrenFieldName])
+            ) {
                 branch[childrenFieldName] = [
                     ...branch[childrenFieldName],
                     ...children,
@@ -88,7 +91,10 @@ const buildTree = (
 
     // continue to build trees with branches in nodes role
     // and retunning trees when completed
-    return [...trees, ...buildTree(branches, keyName, parentFieldName)]
+    return [
+        ...trees,
+        ...buildTree(branches, keyName, parentFieldName, { childrenFieldName }),
+    ]
 }
 
 module.exports = {
