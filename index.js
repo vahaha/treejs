@@ -6,6 +6,8 @@ const _ = require('lodash')
  * @param {String} keyName field name of the node key.
  * @param {String} parentFieldName parent field name (foreign key).
  * @param {Object} [options] options for building trees
+ *
+ * Opstion object: {childrenFieldName: 'children', cloneDeep: false}
  */
 const buildTree = (
     nodes,
@@ -32,43 +34,60 @@ const buildTree = (
 
     const indexNodes = _.keyBy(availableNodes, keyName)
 
-    let leafIds = new Set(Object.keys(indexNodes))
+    return findChildren(
+        indexNodes,
+        Object.keys(indexNodes),
+        keyName,
+        parentFieldName,
+        { childrenFieldName }
+    )
+}
+
+const findChildren = (
+    indexNodes,
+    nodeIds,
+    keyName,
+    parentFieldName,
+    { childrenFieldName }
+) => {
+    let leafIds = new Set(nodeIds)
     const parentIds = new Set()
 
-    // find leafs
-    for (let i = 0; i < availableNodes.length; i++) {
-        const parentId = availableNodes[i][parentFieldName]
+    // find leaves
+    nodeIds.forEach(nodeId => {
+        const node = indexNodes[nodeId]
+        const parentId = node[parentFieldName]
 
         if (parentId) {
             parentIds.add(parentId)
-            leafIds.delete(parentId.toString())
+            leafIds.delete(parentId)
         }
-    }
+    })
 
     leafIds = Array.from(leafIds)
-    let leafs = leafIds.map(id => indexNodes[id])
+    let leaves = leafIds.map(id => indexNodes[id])
 
     /* find trees */
     // nodes stand alone(don't have parent), that's tree
-    const tmpLeafs = []
+    const tmpLeaves = []
     const trees = []
 
-    for (let i = 0; i < leafs.length; i++) {
-        if (leafs[i][parentFieldName]) {
-            tmpLeafs.push(leafs[i])
+    leaves.forEach(leaf => {
+        if (leaf[parentFieldName]) {
+            tmpLeaves.push(leaf)
         } else {
-            trees.push(leafs[i])
+            trees.push(leaf)
         }
-    }
-    leafs = tmpLeafs
+    })
+    leaves = tmpLeaves
 
-    if (!leafs.length) {
+    if (!leaves.length) {
         return trees
     }
 
-    // There are leafs, that have parent. We need to continue to build tree.
-    // groupping leafs to branch level
-    const leafGroup = _.groupBy(leafs, parentFieldName)
+    // There are leaves, that have parent. We need to continue to build tree.
+    // groupping leaves to branch level
+    const leafGroup = _.groupBy(leaves, parentFieldName)
     const branches = Array.from(parentIds).map(id => {
         const parentId = id.toString()
         const branch = indexNodes[parentId]
@@ -93,7 +112,15 @@ const buildTree = (
     // and retunning trees when completed
     return [
         ...trees,
-        ...buildTree(branches, keyName, parentFieldName, { childrenFieldName }),
+        ...findChildren(
+            indexNodes,
+            branches.map(e => e[keyName]),
+            keyName,
+            parentFieldName,
+            {
+                childrenFieldName,
+            }
+        ),
     ]
 }
 
