@@ -7,13 +7,13 @@ const _ = require('lodash')
  * @param {String} parentFieldName parent field name (foreign key).
  * @param {Object} [options] options for building trees
  *
- * Opstion object: {childrenFieldName: 'children', cloneDeep: false}
+ * Option object: {childrenFieldName: 'children', cloneDeep: false, sort}
  */
 const buildTree = (
     nodes,
     keyName,
     parentFieldName,
-    options = { childrenFieldName: 'children', cloneDeep: false }
+    options = { childrenFieldName: 'children', cloneDeep: false}
 ) => {
     if (!Array.isArray(nodes)) {
         throw new Error('nodes must be an array')
@@ -27,7 +27,7 @@ const buildTree = (
         throw new Error('unknown parent field name')
     }
 
-    const { childrenFieldName, cloneDeep } = options
+    const { cloneDeep = false } = options
 
     let availableNodes = nodes.filter(node => node)
     availableNodes = cloneDeep ? _.cloneDeep(availableNodes) : availableNodes
@@ -39,7 +39,7 @@ const buildTree = (
         Object.keys(indexNodes),
         keyName,
         parentFieldName,
-        { childrenFieldName }
+        options
     )
 }
 
@@ -48,8 +48,9 @@ const findChildren = (
     nodeIds,
     keyName,
     parentFieldName,
-    { childrenFieldName }
+   options
 ) => {
+    const  { childrenFieldName = 'children', sort } = options
     let leafIds = new Set(nodeIds)
     const parentIds = new Set()
 
@@ -104,24 +105,31 @@ const findChildren = (
             } else {
                 branch[childrenFieldName] = children
             }
+            if(sort) {
+                branch[childrenFieldName].sort(sort)
+            }
         }
         return branch
     })
 
     // continue to build trees with branches in nodes role
     // and retunning trees when completed
-    return [
+    const remainTrees = findChildren(
+        indexNodes,
+        branches.map(e => e[keyName]),
+        keyName,
+        parentFieldName,
+        options
+    )
+
+    const result = [
         ...trees,
-        ...findChildren(
-            indexNodes,
-            branches.map(e => e[keyName]),
-            keyName,
-            parentFieldName,
-            {
-                childrenFieldName,
-            }
-        ),
+        ...remainTrees
     ]
+
+    if(sort){
+        return result.sort(sort)
+    }
 }
 
 module.exports = {
