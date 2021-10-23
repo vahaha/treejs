@@ -2,14 +2,41 @@
 ```js
 const Tree = require('@vahaha/treejs');
 
+const tree = Tree.fromNodes(nodes, options);
+```
+
+### Optional object
+- key (default 'id'): field name is key
+- parentKey (default 'parentId'): field name is parent key
+- childrenKey (default 'children'): field name is children key.
+- sort: function is used to sort nodes
+### References:
+- fromNodes function: build trees from array of nodes
+- TreeJS object:
+  - getBranch: get branch (sub tree) from a node
+  - getNodesOfBranch: get all nodes are descendant of a node. Result include current node.
+- TreeNode object:
+  - getPath: get path direct to root
+  - getParent: get parent of current node
+  - setParent: set parent of current node. This action also adds current node to children list of parent.
+  - addChild: add child/children to node.This action also sets current node as parent of added child/children
+  - inheritPath: refresh path of current node by inherit from parent
+  - visitAncestors: refresh path by visit all ancestors
+  - visitDescendants: refresh path of all descendants
+
+## Old version <= 1.14
+---
+```js
+const Tree = require('@vahaha/treejs');
+
 const tree = Tree.buildTree(nodes, keyName, parentFieldName, options);
 ```
 
 ### Options
 
 Optional object
-- childrenFieldName ('children' is default): custome children field name.
-- cloneDeep (false is default): if true, it'll clone deep array of nodes. This ensures that any tree updates will not affect input nodes. However, you should pay attention to system performance if the number of nodes is large.
+- childrenFieldName ('children' is default): custom children field name.
+- cloneDeep (false is default): if true, it'll clone deep array of nodes.
 
 ### Example:
 ```js
