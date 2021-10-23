@@ -10,9 +10,11 @@ const tree2 = TreeJS.fromNodes(nodes, {
     key: 'id',
     parentKey: 'parentId',
     sort: (a, b) => (a.id > b.id ? 1 : -1),
-}).trees
-console.log(JSON.stringify(tree2, null, 2))
+}) // tree2[0].getChild(0).addChild({ id: 8, name: 'eight' })
+console.log(JSON.stringify(tree2[0].getBranch(111), null, 2))
 
+const nodesOfBranch = tree2.getNodesOfBranch(1)
+console.log(nodesOfBranch)
 // const baseTree = JSON.parse(JSON.stringify(tree2))
 
 // const tree3 = new TreeJS(baseTree, {

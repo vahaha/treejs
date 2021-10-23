@@ -19,45 +19,51 @@ function Option({
 
 /**
  * Innit TreeJS from array of trees.
- * @param {Array} trees array of trees.
+ * @param {Object} tree tree object
  * @param {Option} [options] options for building trees
  *
  * Option object: {key: 'id', parentKey: 'parentId', childrenKey: 'children', sort}
  */
 function TreeJS(
-    trees,
+    tree,
     options = {
         key: 'id',
         parentKey: 'parentId',
         childrenKey: 'children',
     }
 ) {
-    if (!Array.isArray(trees)) {
-        throw new Error('trees must be an array')
+    if (typeof tree !== 'object' || Array.isArray(tree)) {
+        throw new Error('tree must be an object')
     }
 
     const _options = new Option(options)
     const mapIdNodes = new Map()
 
-    this.trees = trees.map(tree => new TreeNode(tree, _options))
-    scanTree(mapIdNodes, this.trees, _options)
+    this.tree = new TreeNode(tree, _options)
+    scanTree(mapIdNodes, [this.tree], _options)
+
+    this.getBranch = function (id) {
+        return mapIdNodes.get(id)
+    }
+
+    this.getNodesOfBranch = function (id) {
+        const root = mapIdNodes.get(id)
+        if (!root) {
+            return root
+        }
+
+        const nodes = [root]
+        mapIdNodes.forEach(node => {
+            const path = node.getPath() || new Set()
+            if (path.has(id)) {
+                nodes.push(node)
+            }
+        })
+
+        return nodes
+    }
 
     return this
-}
-
-function scanTree(mapIdNodes, nodes, options) {
-    const { key, childrenKey } = options
-
-    nodes.forEach(node => {
-        mapIdNodes.set(node[key], node)
-        let children = node[childrenKey]
-        if (children && children.length) {
-            children = children.map(child => new TreeNode(child, options))
-            children.forEach(child => child.setParent(node))
-            node[childrenKey] = children
-            scanTree(mapIdNodes, children, options)
-        }
-    })
 }
 
 /**
@@ -84,15 +90,18 @@ TreeJS.fromNodes = (
     const _options = new Option(options)
     const { key, parentKey } = _options
 
+    // clean nodes
     let availableNodes = nodes.filter(node => node)
     availableNodes = _.cloneDeep(availableNodes)
 
+    // create index by id
     const mapIdNodes = new Map()
     availableNodes.forEach(entity => {
         const node = new TreeNode(entity, _options)
         mapIdNodes.set(node[key], node)
     })
 
+    // attach parent to child node
     mapIdNodes.forEach(node => {
         const parentId = node[parentKey]
         if ([undefined, null].includes(parentId)) {
@@ -104,10 +113,11 @@ TreeJS.fromNodes = (
         }
     })
 
+    // build trees
     const trees = build(mapIdNodes, [...mapIdNodes.keys()], _options)
     trees.forEach(root => root.visitDescendants())
 
-    return new TreeJS(trees, _options)
+    return trees.map(tree => new TreeJS(tree, _options))
 }
 
 /**
@@ -161,43 +171,39 @@ TreeJS.buildTree = (
 }
 
 const build = (mapIdNodes, nodeIds, options) => {
-    const { parentKey, childrenKey, sort } = options
-    const leafGroup = new Map()
-
-    nodeIds.forEach(id => {
-        const node = mapIdNodes.get(id)
-        const parentId = node[parentKey]
-        if (!leafGroup.has(parentId)) {
-            leafGroup.set(parentId, [])
-        }
-        const group = leafGroup.get(parentId)
-        group.push(node)
-    })
-
-    const parentIds = [...leafGroup.keys()]
+    const { parentKey, sort } = options
     const trees = []
-    parentIds.forEach(parentId => {
-        const branch = mapIdNodes.get(parentId)
-        const children = leafGroup.get(parentId)
-        if (!branch) {
-            return trees.push(...children)
+
+    mapIdNodes.forEach(node => {
+        const parentId = node[parentKey]
+        const parent = mapIdNodes.get(parentId)
+        if ([undefined, null].includes(parentId) || !parent) {
+            return trees.push(node)
         }
 
-        if (branch[childrenKey] && Array.isArray(branch[childrenKey])) {
-            branch[childrenKey] = [...branch[childrenKey], ...children]
-        } else {
-            branch[childrenKey] = children
-        }
-        if (typeof sort === 'function') {
-            branch[childrenKey].sort(sort)
-        }
+        node.setParent(parent)
     })
 
     if (typeof sort === 'function') {
-        return trees.sort(sort)
+        trees.sort(sort)
     }
 
     return trees
+}
+
+function scanTree(mapIdNodes, nodes, options) {
+    const { key, childrenKey } = options
+
+    nodes.forEach(node => {
+        mapIdNodes.set(node[key], node)
+        let children = node[childrenKey]
+        if (children && children.length) {
+            children = children.map(child => new TreeNode(child, options))
+            children.forEach(child => child.setParent(node))
+            node[childrenKey] = children
+            scanTree(mapIdNodes, children, options)
+        }
+    })
 }
 
 module.exports = TreeJS
