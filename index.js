@@ -18,9 +18,9 @@ function Option({
 }
 
 /**
- * Innit TreeJS from array of trees.
- * @param {Object} tree tree object
- * @param {Option} [options] options for building trees
+ * Innit TreeJS from a tree json
+ * @param {Object} tree tree json
+ * @param {Option} [options] options for building tree
  *
  * Option object: {key: 'id', parentKey: 'parentId', childrenKey: 'children', sort}
  */
@@ -74,6 +74,8 @@ function TreeJS(
  * @param {Option} [options] options for building trees
  *
  * Option object: {key: 'id', parentKey: 'parentId', childrenKey: 'children', sort}
+ *
+ * @return {Array} array of TreeJS object
  */
 TreeJS.fromNodes = (
     nodes,
@@ -90,7 +92,7 @@ TreeJS.fromNodes = (
     const _options = new Option(options)
     const { key, parentKey } = _options
 
-    // clean nodes
+    // always clean nodes
     let availableNodes = nodes.filter(node => node)
     availableNodes = _.cloneDeep(availableNodes)
 

@@ -2,29 +2,38 @@
 ```js
 const Tree = require('@vahaha/treejs');
 
-const tree = Tree.fromNodes(nodes, options);
+const arrTreeJs = Tree.fromNodes(nodes, options); // array of TreeJS objects
+const tree = arrTreeJs[0].tree // tree json
 ```
 
 ### Optional object
 - key (default 'id'): field name is key
 - parentKey (default 'parentId'): field name is parent key
 - childrenKey (default 'children'): field name is children key.
-- sort: function is used to sort nodes
+- sort: function is used to sort nodes (ex: (a, b) => a.id > b.id ? 1 : -1)
 ### References:
-- fromNodes function: build trees from array of nodes
+- fromNodes function: build trees from array of nodes (return array of TreeJS objects)
 - TreeJS object:
-  - getBranch: get branch (sub tree) from a node
-  - getNodesOfBranch: get all nodes are descendant of a node. Result include current node.
+  - property:
+    - tree: tree json
+  - functions:
+    - construction: init TreeJS object from a tree json
+    - getBranch: get branch (sub tree) from a node
+    - getNodesOfBranch: get all nodes are descendant of a node. Result include current node.
 - TreeNode object:
-  - getPath: get path direct to root
-  - getParent: get parent of current node
-  - setParent: set parent of current node. This action also adds current node to children list of parent.
-  - addChild: add child/children to node.This action also sets current node as parent of added child/children
-  - inheritPath: refresh path of current node by inherit from parent
-  - visitAncestors: refresh path by visit all ancestors
-  - visitDescendants: refresh path of all descendants
+  - properties:
+    - cloned properties of your node
+    - [childrenKey] (default 'children'): contains child nodes
+  - functions:
+    - getPath: get path direct to root
+    - getParent: get parent of current node
+    - setParent: set parent of current node. This action also adds current node to children list of parent.
+    - addChild: add child/children to node.This action also sets current node as parent of added child/children
+    - inheritPath: refresh path of current node by inherit from parent
+    - visitAncestors: refresh path by visit all ancestors
+    - visitDescendants: refresh path of all descendants
 
-## Old version <= 1.14
+## Old version <= 1.1.4
 ---
 ```js
 const Tree = require('@vahaha/treejs');
