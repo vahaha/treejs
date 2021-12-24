@@ -11,27 +11,43 @@ const tree = arrTreeJs[0].tree // tree json
 - parentKey (default 'parentId'): field name is parent key
 - childrenKey (default 'children'): field name is children key.
 - sort: function is used to sort nodes (ex: (a, b) => a.id > b.id ? 1 : -1)
+```js
+const Tree = require('@vahaha/treejs');
+const nodes = [
+    {"_id_": "1", "name": "Root 1"},
+    {"_id_": "2", "name": "Branch 1", "refParentId": "1"},
+];
+
+// use options object
+const arrTreeJs = Tree.fromNodes(nodes, {
+    key: '_id',
+    parentKey: 'refParentId',
+    sort: (a, b) => a._id > b._id ? 1 : -1 
+});
+
+const tree = arrTreeJs[0].tree // tree json
+```
 ### References:
 - fromNodes function: build trees from array of nodes (return array of TreeJS objects)
 - TreeJS object:
   - property:
     - tree: tree json
   - functions:
-    - construction: init TreeJS object from a tree json
-    - getBranch: get branch (sub tree) from a node
-    - getNodesOfBranch: get all nodes are descendant of a node. Result include current node.
+    - construction(tree): init TreeJS object from a tree json
+    - getBranch(id): get branch (sub tree) from a node
+    - getNodesOfBranch(id): get all nodes are descendant of a node. Result include current node.
 - TreeNode object:
   - properties:
     - cloned properties of your node
     - [childrenKey] (default 'children'): contains child nodes
   - functions:
-    - getPath: get path direct to root
-    - getParent: get parent of current node
-    - setParent: set parent of current node. This action also adds current node to children list of parent.
-    - addChild: add child/children to node.This action also sets current node as parent of added child/children
-    - inheritPath: refresh path of current node by inherit from parent
-    - visitAncestors: refresh path by visit all ancestors
-    - visitDescendants: refresh path of all descendants
+    - getPath(): get path direct to root
+    - getParent(): get parent of current node
+    - setParent(parent: TreeNode): set parent of current node. This action also adds current node to children list of parent.
+    - addChild(...children): add child/children to node.This action also sets current node as parent of added child/children
+    - inheritPath(): refresh path of current node by inherit from parent
+    - visitAncestors(): refresh path by visit all ancestors
+    - visitDescendants(): refresh path of all descendants
 
 ## Old version <= 1.1.4
 ---

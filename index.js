@@ -42,6 +42,11 @@ function TreeJS(
     this.tree = new TreeNode(tree, _options)
     scanTree(mapIdNodes, [this.tree], _options)
 
+    /**
+     * Get branch from a node
+     * @param {any} id Node id
+     * @return a TreeNode
+     */
     this.getBranch = function (id) {
         return mapIdNodes.get(id)
     }
@@ -61,6 +66,15 @@ function TreeJS(
         })
 
         return nodes
+    }
+
+    /**
+     * Get a node. This function is same getBranch
+     * @param {any} id Node id
+     * @return a TreeNode
+     */
+    this.getNode = function (id) {
+        return mapIdNodes.get(id)
     }
 
     return this
