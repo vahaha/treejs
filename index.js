@@ -74,11 +74,13 @@ function TreeJS(
      * @return a TreeNode
      */
     this.getNode = function (id) {
-        return mapIdNodes.get(id)
+        return this.getBranch(id)
     }
 
     return this
 }
+
+TreeJS.TreeNode = TreeNode
 
 /**
  * Build trees from array of nodes.
