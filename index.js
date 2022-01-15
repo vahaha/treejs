@@ -41,6 +41,10 @@ function TreeJS(
 
     this.tree = new TreeNode(tree, _options)
     scanTree(mapIdNodes, [this.tree], _options)
+    const allNodes = []
+    mapIdNodes.forEach(val => {
+        allNodes.push(val)
+    })
 
     /**
      * Get branch from a node
@@ -75,6 +79,14 @@ function TreeJS(
      */
     this.getNode = function (id) {
         return this.getBranch(id)
+    }
+
+    /**
+     * Get all nodes of tree
+     * @returns Array<TreeNode>
+     */
+    this.getAllNodes = function () {
+        return allNodes
     }
 
     return this

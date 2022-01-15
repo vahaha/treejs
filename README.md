@@ -113,6 +113,7 @@ const parent = node.getParent() // {id: "3", "name", "Branch 2", "parentId": "1"
     - getBranch(id): get branch (sub tree) from a node
     - getNodesOfBranch(id): get all nodes are descendant of a node. Result include current node.
     - getNode(id): get a node by id. (alias getBranch)
+    - getAllNodes(): get all nodes of tree
 - TreeNode object:
   - properties:
     - cloned properties of your node
