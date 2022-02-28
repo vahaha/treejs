@@ -7,10 +7,12 @@ const tree = arrTreeJs[0].tree // tree json
 ```
 
 ### Optional object
-- key (default 'id'): field name is key
+- key (default 'id'): field name is key. 
 - parentKey (default 'parentId'): field name is parent key
 - childrenKey (default 'children'): field name is children key.
 - sort: function is used to sort nodes (ex: (a, b) => a.id > b.id ? 1 : -1)
+
+(**caution**: we distinguish data type of id, Mongodb ObjectId must be convert to string before build tree)
 ```js
 const Tree = require('@vahaha/treejs');
 const nodes = [
@@ -119,7 +121,7 @@ const parent = node.getParent() // {id: "3", "name", "Branch 2", "parentId": "1"
     - cloned properties of your node
     - [childrenKey] (default 'children'): contains child nodes
   - functions:
-    - getPath(): get path direct to root
+    - getPath(): get path direct to root. This function return array of nodes id from parent up to root.
     - getParent(): get parent of current node
     - setParent(parent: TreeNode): set parent of current node. This action also adds current node to children list of parent.
     - addChild(...children): add child/children to node.This action also sets current node as parent of added child/children
